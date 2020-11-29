@@ -39,6 +39,7 @@ vim-which-key is vim port of [emacs-which-key](https://github.com/justbur/emacs-
 
 - Better UI, vim's `popup` and neovim's `floating_win` are supported.
 - Show all mappings following a prefix, e.g., `<leader>`, `<localleader>`, etc.
+- Better default for some well known buffers via which-key extensions.
 - Instant response for your every single input.
 - Dynamic update on every call.
 - Define group names and arbitrary descriptions.

@@ -12,6 +12,13 @@ let s:TYPE = {
 let g:which_key#TYPE = s:TYPE
 
 let s:should_note_winid = exists('*win_getid')
+let s:buffer_cache = {}
+let s:TYPE = g:which_key#util#TYPE
+
+let s:cur_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
+let g:which_key#extensions = map(
+      \ split(globpath(s:cur_dir.'/which_key/extensions', '*'), '\n'),
+      \ 'fnamemodify(v:val, '':t:r'')')
 
 function! which_key#register(prefix, dict) abort
   let key = a:prefix ==? '<Space>' ? ' ' : a:prefix
@@ -43,6 +50,40 @@ function! s:handle_char_on_start_is_ok(c) abort
   endif
 endfunction
 
+function! which_key#start_buffer(vis, ...) abort
+  let key = '<buffer>'
+  if empty(s:buffer_cache) || g:which_key_run_map_on_popup
+    let s:buffer_cache = {}
+    call which_key#map#parse(key, s:buffer_cache, s:vis ==# 'gv' ? 1 : 0)
+  endif
+
+  let native = s:buffer_cache
+
+  try
+    let l:external = g:which_key#extensions#{&filetype}#
+  catch /^Vim\%((\a\+)\)\=:E121/
+  endtry
+
+  if exists('b:which_key')
+    if get(b:, 'which_key_no_native', 0)
+      let s:runtime = external
+    else
+      call s:merge(external, native)
+      let s:runtime = external
+    endif
+  else
+
+    if exists('l:external')
+      call s:merge(l:external, native)
+      let s:runtime = l:external
+    else
+      let s:runtime = native
+    endif
+  endif
+
+  call which_key#window#open(s:runtime)
+endfunction
+
 function! which_key#start(vis, bang, prefix) " {{{
   let s:vis = a:vis ? 'gv' : ''
   let s:count = v:count != 0 ? v:count : ''
@@ -50,6 +91,11 @@ function! which_key#start(vis, bang, prefix) " {{{
 
   if s:should_note_winid
     let g:which_key_origin_winid = win_getid()
+  if a:prefix == '<buffer>'
+        \ || exists('b:which_key')
+        \ || index(g:which_key#extensions, &filetype) > -1
+    call which_key#start_buffer(a:vis)
+    return
   endif
 
   if a:bang
