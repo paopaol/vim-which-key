@@ -13,7 +13,7 @@ let g:which_key#TYPE = s:TYPE
 
 let s:should_note_winid = exists('*win_getid')
 let s:buffer_cache = {}
-let s:TYPE = g:which_key#util#TYPE
+"let s:TYPE = g:which_key#util#TYPE
 
 let s:cur_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let g:which_key#extensions = map(
