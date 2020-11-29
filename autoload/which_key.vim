@@ -91,6 +91,7 @@ function! which_key#start(vis, bang, prefix) " {{{
 
   if s:should_note_winid
     let g:which_key_origin_winid = win_getid()
+  endif
   if a:prefix == '<buffer>'
         \ || exists('b:which_key')
         \ || index(g:which_key#extensions, &filetype) > -1
